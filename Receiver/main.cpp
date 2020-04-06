@@ -32,11 +32,29 @@
  * SOFTWARE.
  */
 
-#include <QCoreApplication>
+#include <QGuiApplication>
+#include <QQmlApplicationEngine>
+
+#include "receiver.h"
 
 int main(int argc, char *argv[])
 {
-	QCoreApplication a(argc, argv);
+	QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+	QGuiApplication app(argc, argv);
 
-	return a.exec();
+	QCoreApplication::setApplicationName("remotesubtilereceiver");
+	QCoreApplication::setOrganizationDomain("receiver.remotesubtitle.vjp.piarista.hu");
+
+	qmlRegisterType<Receiver>("Receiver", 1, 0, "Receiver");
+
+	QQmlApplicationEngine engine;
+	const QUrl url(QStringLiteral("qrc:/main.qml"));
+	QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
+					 &app, [url](QObject *obj, const QUrl &objUrl) {
+		if (!obj && url == objUrl)
+			QCoreApplication::exit(-1);
+	}, Qt::QueuedConnection);
+	engine.load(url);
+
+	return app.exec();
 }

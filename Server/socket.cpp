@@ -95,8 +95,10 @@ void Socket::onTextMessageReceived(const QString &message)
 
 		if (p == "SENDER")
 			setSocketType(SocketSender);
-		else if (p == "RECEIVER")
+		else if (p == "RECEIVER") {
 			setSocketType(SocketReceiver);
+			m_socket->sendTextMessage("");
+		}
 
 		qDebug() << "SOCKET TYPE" << m_socketType;
 	} else if (m_socketType == SocketSender) {

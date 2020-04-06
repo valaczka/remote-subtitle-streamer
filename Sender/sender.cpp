@@ -1,12 +1,12 @@
 /*
  * ---- Call of Suli ----
  *
- * %{Cpp:License:FileName}
+ * sender.cpp
  *
  * Created on: 2020. 04. 06.
  *     Author: Valaczka János Pál <valaczka.janos@piarista.hu>
  *
- * %{Cpp:License:ClassName}
+ * Sender
  *
  *  This file is part of Call of Suli.
  *
@@ -32,29 +32,32 @@
  * SOFTWARE.
  */
 
-#include <QGuiApplication>
-#include <QQmlApplicationEngine>
-
 #include "sender.h"
+#include <QFile>
 
-int main(int argc, char *argv[])
+Sender::Sender(QObject *parent) : QObject(parent)
 {
-	QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-	QGuiApplication app(argc, argv);
 
-	QCoreApplication::setApplicationName("remotesubtilesender");
-	QCoreApplication::setOrganizationDomain("sender.remotesubtitle.vjp.piarista.hu");
+}
 
-	qmlRegisterType<Sender>("Sender", 1, 0, "Sender");
 
-	QQmlApplicationEngine engine;
-	const QUrl url(QStringLiteral("qrc:/main.qml"));
-	QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
-					 &app, [url](QObject *obj, const QUrl &objUrl) {
-		if (!obj && url == objUrl)
-			QCoreApplication::exit(-1);
-	}, Qt::QueuedConnection);
-	engine.load(url);
+/**
+ * @brief Sender::loadData
+ * @return
+ */
 
-	return app.exec();
+QStringList Sender::loadData()
+{
+	QStringList list;
+
+	QFile f("/sdcard/SynologyCloud/Közös/subtitle.txt");
+
+	if (f.open(QIODevice::ReadOnly)) {
+		QByteArray data = f.readAll();
+		QString s(data);
+
+		list = s.split("\n\n");
+	}
+
+	return list;
 }

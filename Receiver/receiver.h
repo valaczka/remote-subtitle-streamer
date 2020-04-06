@@ -1,12 +1,12 @@
 /*
  * ---- Call of Suli ----
  *
- * %{Cpp:License:FileName}
+ * receiver.h
  *
  * Created on: 2020. 04. 06.
  *     Author: Valaczka János Pál <valaczka.janos@piarista.hu>
  *
- * %{Cpp:License:ClassName}
+ * Receiver
  *
  *  This file is part of Call of Suli.
  *
@@ -32,29 +32,35 @@
  * SOFTWARE.
  */
 
-#include <QGuiApplication>
-#include <QQmlApplicationEngine>
+#ifndef RECEIVER_H
+#define RECEIVER_H
 
-#include "sender.h"
+#include <QObject>
+#include <QUrl>
 
-int main(int argc, char *argv[])
+class Receiver : public QObject
 {
-	QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-	QGuiApplication app(argc, argv);
+	Q_OBJECT
 
-	QCoreApplication::setApplicationName("remotesubtilesender");
-	QCoreApplication::setOrganizationDomain("sender.remotesubtitle.vjp.piarista.hu");
+	Q_PROPERTY(QString fileName READ fileName WRITE setFileName NOTIFY fileNameChanged)
+	QString m_fileName;
 
-	qmlRegisterType<Sender>("Sender", 1, 0, "Sender");
+public:
+	explicit Receiver(QObject *parent = nullptr);
+	QString fileName() const { return m_fileName; }
 
-	QQmlApplicationEngine engine;
-	const QUrl url(QStringLiteral("qrc:/main.qml"));
-	QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
-					 &app, [url](QObject *obj, const QUrl &objUrl) {
-		if (!obj && url == objUrl)
-			QCoreApplication::exit(-1);
-	}, Qt::QueuedConnection);
-	engine.load(url);
+public slots:
+	QUrl getUrl();
+	void setUrl(const QUrl &url);
+	void setFileName(QString fileName);
+	void saveFile();
+	QString parseMessage(const QString &message);
 
-	return app.exec();
-}
+	int getSize();
+	void setSize(const int &size);
+
+signals:
+	void fileNameChanged(QString fileName);
+};
+
+#endif // RECEIVER_H

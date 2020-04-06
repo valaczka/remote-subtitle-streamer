@@ -1,12 +1,12 @@
 /*
  * ---- Call of Suli ----
  *
- * %{Cpp:License:FileName}
+ * sender.h
  *
  * Created on: 2020. 04. 06.
  *     Author: Valaczka János Pál <valaczka.janos@piarista.hu>
  *
- * %{Cpp:License:ClassName}
+ * Sender
  *
  *  This file is part of Call of Suli.
  *
@@ -32,29 +32,22 @@
  * SOFTWARE.
  */
 
-#include <QGuiApplication>
-#include <QQmlApplicationEngine>
+#ifndef SENDER_H
+#define SENDER_H
 
-#include "sender.h"
+#include <QObject>
 
-int main(int argc, char *argv[])
+class Sender : public QObject
 {
-	QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-	QGuiApplication app(argc, argv);
+	Q_OBJECT
+public:
+	explicit Sender(QObject *parent = nullptr);
 
-	QCoreApplication::setApplicationName("remotesubtilesender");
-	QCoreApplication::setOrganizationDomain("sender.remotesubtitle.vjp.piarista.hu");
+public slots:
+	QStringList loadData();
 
-	qmlRegisterType<Sender>("Sender", 1, 0, "Sender");
+signals:
 
-	QQmlApplicationEngine engine;
-	const QUrl url(QStringLiteral("qrc:/main.qml"));
-	QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
-					 &app, [url](QObject *obj, const QUrl &objUrl) {
-		if (!obj && url == objUrl)
-			QCoreApplication::exit(-1);
-	}, Qt::QueuedConnection);
-	engine.load(url);
+};
 
-	return app.exec();
-}
+#endif // SENDER_H
